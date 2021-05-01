@@ -7,7 +7,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart';
-
+import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'echarts_script.dart' show echartsScript;
@@ -71,9 +71,14 @@ class _EchartsState extends State<Echarts> {
     _currentOption = widget.option;
 
     if (widget.reloadAfterInit) {
-      new Future.delayed(const Duration(milliseconds: 200), () {
+      new Future.delayed(const Duration(milliseconds: 1500), () {
         _controller.reload();
+        print("hat nach 1s reload");
       });
+      /*new Future.delayed(const Duration(milliseconds: 10000), () {
+        _controller.reload();
+        print("hat nach 10s reload");
+      });*/
     }
   }
 
@@ -158,29 +163,49 @@ class _EchartsState extends State<Echarts> {
     return Opacity(
         opacity: _opacity,
         // --- FIX_BLINK ---
-        child: WebView(
-            initialUrl: htmlBase64,
-            javascriptMode: JavascriptMode.unrestricted,
-            onWebViewCreated: (WebViewController webViewController) {
-              _controller = webViewController;
-            },
-            onPageFinished: (String url) {
-              // --- FIX_BLINK ---
-              if (Platform.isAndroid) {
-                setState(() {
-                  _opacity = 1.0;
-                });
-              }
-              // --- FIX_BLINK ---
-              init();
-            },
-            javascriptChannels: <JavascriptChannel>[
-              JavascriptChannel(
-                  name: 'Messager',
-                  onMessageReceived: (JavascriptMessage javascriptMessage) {
-                    widget?.onMessage(javascriptMessage.message);
-                  }),
-            ].toSet(),
-            gestureRecognizers: getGestureRecognizers()));
+        child: Column(children: [
+          Container(
+            child: Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  icon: Icon(Icons.refresh,
+                      color: Colors.white,
+                      size: 20.0 *
+                          MediaQuery.of(context).size.height *
+                          0.01 /
+                          7.4),
+                  tooltip: "Reload",
+                  onPressed: () {
+                    _controller.reload();
+                  },
+                )),
+          ),
+          Expanded(
+              child: WebView(
+                  initialUrl: htmlBase64,
+                  javascriptMode: JavascriptMode.unrestricted,
+                  onWebViewCreated: (WebViewController webViewController) {
+                    _controller = webViewController;
+                  },
+                  onPageFinished: (String url) {
+                    // --- FIX_BLINK ---
+                    if (Platform.isAndroid) {
+                      setState(() {
+                        _opacity = 1.0;
+                      });
+                    }
+                    // --- FIX_BLINK ---
+                    init();
+                  },
+                  javascriptChannels: <JavascriptChannel>[
+                    JavascriptChannel(
+                        name: 'Messager',
+                        onMessageReceived:
+                            (JavascriptMessage javascriptMessage) {
+                          widget?.onMessage(javascriptMessage.message);
+                        }),
+                  ].toSet(),
+                  gestureRecognizers: getGestureRecognizers()))
+        ]));
   }
 }
