@@ -9,7 +9,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
+import 'package:matxmate/shared/constants.dart';
 import 'echarts_script.dart' show echartsScript;
 
 /// <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, target-densitydpi=device-dpi" /><style type="text/css">body,html,#chart{height: 100%;width: 100%;margin: 0px;}div {-webkit-tap-highlight-color:rgba(255,255,255,0);}</style></head><body><div id="chart" /></body></html>
@@ -163,24 +163,8 @@ class _EchartsState extends State<Echarts> {
     return Opacity(
         opacity: _opacity,
         // --- FIX_BLINK ---
-        child: Column(children: [
+        child: Stack(children: [
           Container(
-            child: Align(
-                alignment: Alignment.topRight,
-                child: IconButton(
-                  icon: Icon(Icons.refresh,
-                      color: Colors.white,
-                      size: 20.0 *
-                          MediaQuery.of(context).size.height *
-                          0.01 /
-                          7.4),
-                  tooltip: "Reload",
-                  onPressed: () {
-                    _controller.reload();
-                  },
-                )),
-          ),
-          Expanded(
               child: WebView(
                   initialUrl: htmlBase64,
                   javascriptMode: JavascriptMode.unrestricted,
@@ -205,7 +189,23 @@ class _EchartsState extends State<Echarts> {
                           widget?.onMessage(javascriptMessage.message);
                         }),
                   ].toSet(),
-                  gestureRecognizers: getGestureRecognizers()))
+                  gestureRecognizers: getGestureRecognizers())),
+          Container(
+            child: Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  icon: Icon(Icons.refresh,
+                      color: stoBottom,
+                      size: 20.0 *
+                          MediaQuery.of(context).size.height *
+                          0.01 /
+                          7.4),
+                  tooltip: "Reload",
+                  onPressed: () {
+                    _controller.reload();
+                  },
+                )),
+          )
         ]));
   }
 }
