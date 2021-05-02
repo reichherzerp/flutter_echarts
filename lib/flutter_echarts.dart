@@ -192,7 +192,6 @@ class _EchartsState extends State<Echarts> {
             margin: EdgeInsets.only(
                 right: 10.0 * MediaQuery.of(context).size.height * 0.01 / 7.4,
                 top: 10.0 * MediaQuery.of(context).size.height * 0.01 / 7.4),
-            //padding: EdgeInsets.only(right: 10.0*MediaQuery.of(context).size.height*0.01/7.4),
             child: Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
