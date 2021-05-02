@@ -9,7 +9,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:matxmate/shared/constants.dart';
 import 'echarts_script.dart' show echartsScript;
 
 /// <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, target-densitydpi=device-dpi" /><style type="text/css">body,html,#chart{height: 100%;width: 100%;margin: 0px;}div {-webkit-tap-highlight-color:rgba(255,255,255,0);}</style></head><body><div id="chart" /></body></html>
@@ -29,6 +28,7 @@ class Echarts extends StatefulWidget {
       this.captureHorizontalGestures = false,
       this.captureVerticalGestures = false,
       this.onLoad,
+      this.color = const Color(0xff1D2B64),
       this.reloadAfterInit = true})
       : super(key: key);
 
@@ -50,6 +50,8 @@ class Echarts extends StatefulWidget {
 
   final void Function() onLoad;
 
+  final Color color;
+
   final bool reloadAfterInit;
 
   @override
@@ -70,15 +72,11 @@ class _EchartsState extends State<Echarts> {
     super.initState();
     _currentOption = widget.option;
 
-    if (widget.reloadAfterInit) {
+    if (Platform.isIOS ? true : false) {
       new Future.delayed(const Duration(milliseconds: 1500), () {
         _controller.reload();
         print("hat nach 1s reload");
       });
-      /*new Future.delayed(const Duration(milliseconds: 10000), () {
-        _controller.reload();
-        print("hat nach 10s reload");
-      });*/
     }
   }
 
@@ -191,11 +189,15 @@ class _EchartsState extends State<Echarts> {
                   ].toSet(),
                   gestureRecognizers: getGestureRecognizers())),
           Container(
+            margin: EdgeInsets.only(
+                right: 10.0 * MediaQuery.of(context).size.height * 0.01 / 7.4,
+                top: 10.0 * MediaQuery.of(context).size.height * 0.01 / 7.4),
+            //padding: EdgeInsets.only(right: 10.0*MediaQuery.of(context).size.height*0.01/7.4),
             child: Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
                   icon: Icon(Icons.refresh,
-                      color: stoBottom,
+                      color: this.widget.color,
                       size: 20.0 *
                           MediaQuery.of(context).size.height *
                           0.01 /
@@ -203,6 +205,7 @@ class _EchartsState extends State<Echarts> {
                   tooltip: "Reload",
                   onPressed: () {
                     _controller.reload();
+                    print("graph reloaded");
                   },
                 )),
           )
