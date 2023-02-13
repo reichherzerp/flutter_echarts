@@ -1,4 +1,5 @@
 library flutter_echarts;
+import 'package:flutter/material.dart';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
@@ -66,7 +67,7 @@ class _EchartsState extends State<Echarts> {
     _currentOption = widget.option;
 
     if (widget.reloadAfterInit) {
-      new Future.delayed(const Duration(milliseconds: 100), () {
+      new Future.delayed(const Duration(milliseconds: 1000), () {
         _controller?.reload();
       });
     }
@@ -145,30 +146,47 @@ class _EchartsState extends State<Echarts> {
 
   @override
   Widget build(BuildContext context) {
-    return WebView(
-        backgroundColor: Color(0x00000000),
-        initialUrl: htmlBase64,
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (WebViewController webViewController) {
-          _controller = webViewController;
-        },
-        onPageFinished: (String url) {
-          init();
-        },
-        onWebResourceError: (e) {
-          if (widget.onWebResourceError != null) {
-            widget.onWebResourceError!(_controller!, Exception(e));
-          }
-        },
-        javascriptChannels: <JavascriptChannel>[
-          JavascriptChannel(
-              name: 'Messager',
-              onMessageReceived: (JavascriptMessage javascriptMessage) {
-                if (widget.onMessage != null) {
-                  widget.onMessage!(javascriptMessage.message);
-                }
-              }),
-        ].toSet(),
-        gestureRecognizers: getGestureRecognizers());
+    return Stack(
+      children: <Widget>[
+        WebView(
+          backgroundColor: Color(0x00000000),
+          initialUrl: htmlBase64,
+          javascriptMode: JavascriptMode.unrestricted,
+          onWebViewCreated: (WebViewController webViewController) {
+            _controller = webViewController;
+          },
+          onPageFinished: (String url) {
+            init();
+          },
+          onWebResourceError: (e) {
+            if (widget.onWebResourceError != null) {
+              widget.onWebResourceError!(_controller!, Exception(e));
+            }
+          },
+          javascriptChannels: <JavascriptChannel>[
+            JavascriptChannel(
+                name: 'Messager',
+                onMessageReceived: (JavascriptMessage javascriptMessage) {
+                  if (widget.onMessage != null) {
+                    widget.onMessage!(javascriptMessage.message);
+                  }
+                }),
+          ].toSet(),
+          gestureRecognizers: getGestureRecognizers()
+        ),
+        Align(
+          alignment: Alignment.topRight,
+          child: TextButton(
+            child: Icon(Icons.refresh, color: Colors.white, size: 18.0),
+            onPressed: () {
+              print('reload -------------------- ===============================');
+              new Future.delayed(const Duration(milliseconds: 100), () {
+                _controller?.reload();
+              });
+            } 
+          )
+        )
+      ]
+    );
   }
 }
